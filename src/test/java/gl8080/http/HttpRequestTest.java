@@ -8,9 +8,9 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
+import static gl8080.http.Constant.*;
+
 public class HttpRequestTest {
-    
-    private static final String CRLF = HttpRequest.CRLF;
     
     @Test
     public void chunk() throws Exception {
