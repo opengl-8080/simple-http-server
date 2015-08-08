@@ -1,6 +1,7 @@
 package gl8080.http;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
@@ -20,18 +21,40 @@ public class Main {
             
             HttpRequest request = new HttpRequest(in);
 
-            HttpResponse response = new HttpResponse(Status.OK);
             
             HttpHeader header = request.getHeader();
             
             if (header.isGetMethod()) {
-                // ★GET メソッドの場合は、パスで指定されたファイルをローカルから取得
-                response.setBody(new File(".", header.getPath()));
+                File file = new File(".", header.getPath());
+                
+                if (file.exists() && file.isFile()) {
+                    responseLocalFile(file, out);
+                } else {
+                    responseNotFoundError(out);
+                }
+            } else {
+                responseOk(out);
             }
-            
-            response.writeTo(out);
         }
         
         System.out.println("<<< end");
+    }
+
+    private static void responseNotFoundError(OutputStream out) throws IOException {
+        HttpResponse response = new HttpResponse(Status.NOT_FOUND);
+        response.addHeader("Content-Type", ContentType.TEXT_PLAIN);
+        response.setBody("404 Not Found");
+        response.writeTo(out);
+    }
+    
+    private static void responseLocalFile(File file, OutputStream out) throws IOException {
+        HttpResponse response = new HttpResponse(Status.OK);
+        response.setBody(file);
+        response.writeTo(out);
+    }
+
+    private static void responseOk(OutputStream out) throws IOException {
+        HttpResponse response = new HttpResponse(Status.OK);
+        response.writeTo(out);
     }
 }
