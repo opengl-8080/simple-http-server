@@ -9,6 +9,8 @@ import java.util.Map;
 
 public class HttpHeader {
     
+    private HttpMethod method;
+    private String path;
     private final String headerText;
     private Map<String, String> messageHeaders = new HashMap<>();
     
@@ -22,7 +24,13 @@ public class HttpHeader {
     }
     
     private String readRequestLine(InputStream in) throws IOException {
-        return IOUtil.readLine(in) + CRLF;
+        String requestLine = IOUtil.readLine(in);
+        
+        String[] tmp = requestLine.split(" ");
+        this.method = HttpMethod.valueOf(tmp[0].toUpperCase());
+        this.path = tmp[1];
+        
+        return requestLine + CRLF;
     }
     
     private StringBuilder readMessageLine(InputStream in) throws IOException {
@@ -57,5 +65,13 @@ public class HttpHeader {
 
     public boolean isChunkedTransfer() {
         return this.messageHeaders.getOrDefault("Transfer-Encoding", "-").equals("chunked");
+    }
+
+    public String getPath() {
+        return this.path;
+    }
+
+    public boolean isGetMethod() {
+        return this.method == HttpMethod.GET;
     }
 }

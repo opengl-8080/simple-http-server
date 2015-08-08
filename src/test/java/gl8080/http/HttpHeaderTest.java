@@ -7,6 +7,33 @@ import static org.hamcrest.MatcherAssert.*;
 import org.junit.Test;
 
 public class HttpHeaderTest {
+    
+    @Test
+    public void method_get() throws Exception {
+        // setup
+        String headerText = "GET /foo/bar HTTP/1.1" + CRLF
+                          + CRLF;
+        
+        // exercise
+        HttpHeader header = new HttpHeader(IOUtil.toInputStream(headerText));
+        
+        // verify
+        assertThat(header.isGetMethod(), is(true));
+    }
+    
+    @Test
+    public void path() throws Exception {
+        // setup
+        String headerText = "GET /foo/bar HTTP/1.1" + CRLF
+                          + CRLF;
+        
+        // exercise
+        HttpHeader header = new HttpHeader(IOUtil.toInputStream(headerText));
+        
+        // verify
+        assertThat(header.getPath(), is("/foo/bar"));
+    }
+    
     @Test
     public void text() throws Exception {
         // setup

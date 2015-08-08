@@ -1,13 +1,8 @@
 package gl8080.http;
 
-import static gl8080.http.Constant.*;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -20,32 +15,23 @@ public class Main {
             ServerSocket server = new ServerSocket(80);
             Socket socket = server.accept();
             InputStream in = socket.getInputStream();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            OutputStream out = socket.getOutputStream();
             ) {
             
             HttpRequest request = new HttpRequest(in);
+
+            HttpResponse response = new HttpResponse(Status.OK);
             
-            System.out.println(request.getHeaderText());
-            System.out.println(request.getBodyText());
+            HttpHeader header = request.getHeader();
             
-            bw.write("HTTP/1.1 200 OK" + CRLF);
+            if (header.isGetMethod()) {
+                // ★GET メソッドの場合は、パスで指定されたファイルをローカルから取得
+                response.setBody(new File(".", header.getPath()));
+            }
+            
+            response.writeTo(out);
         }
         
         System.out.println("<<< end");
-    }
-    
-    public static void hoge(InputStream is) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        
-        String line = in.readLine();
-        StringBuilder header = new StringBuilder();
-        
-        while (line != null) {
-            header.append(line + "\n");
-            System.out.println(line);
-            line = in.readLine();
-        }
-        
-        System.out.println(header);
     }
 }

@@ -1,8 +1,12 @@
 package gl8080.http;
 
+import static gl8080.http.Constant.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -11,6 +15,18 @@ import java.util.List;
 public class IOUtil {
     
     private static final Charset UTF_8 = StandardCharsets.UTF_8;
+    
+    public static void println(OutputStream out, String line) {
+        print(out, line + CRLF);
+    }
+    
+    public static void print(OutputStream out, String line) {
+        try {
+            out.write(line.getBytes(UTF_8));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     public static String readLine(InputStream in) throws IOException {
         List<Byte> list = new ArrayList<>();

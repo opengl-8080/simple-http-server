@@ -65,5 +65,9 @@ public class HttpRequest {
     public String getBodyText() {
         return this.bodyText;
     }
+
+    public HttpHeader getHeader() {
+        return this.header;
+    }
     
 }
