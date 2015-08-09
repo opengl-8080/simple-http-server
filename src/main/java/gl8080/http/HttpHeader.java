@@ -4,6 +4,7 @@ import static gl8080.http.Constant.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class HttpHeader {
         
         String[] tmp = requestLine.split(" ");
         this.method = HttpMethod.valueOf(tmp[0].toUpperCase());
-        this.path = tmp[1];
+        this.path = URLDecoder.decode(tmp[1], "UTF-8");
         
         return requestLine + CRLF;
     }

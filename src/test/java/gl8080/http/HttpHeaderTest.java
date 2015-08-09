@@ -33,6 +33,19 @@ public class HttpHeaderTest {
         // verify
         assertThat(header.getPath(), is("/foo/bar"));
     }
+
+    @Test
+    public void path_url_encoding() throws Exception {
+        // setup
+        String headerText = "GET /foo/%e3%83%86%e3%82%b9%e3%83%88/bar HTTP/1.1" + CRLF
+                          + CRLF;
+        
+        // exercise
+        HttpHeader header = new HttpHeader(IOUtil.toInputStream(headerText));
+        
+        // verify
+        assertThat(header.getPath(), is("/foo/テスト/bar"));
+    }
     
     @Test
     public void text() throws Exception {
