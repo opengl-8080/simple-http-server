@@ -43,4 +43,13 @@ public class ContentTypeTest {
         assertThat(contentType, is(ContentType.IMAGE_JPEG));
     }
 
+    @Test
+    public void unknown() {
+        // exercise
+        ContentType contentType = ContentType.toContentType("xxxx");
+        
+        // verify
+        assertThat(contentType, is(ContentType.TEXT_PLAIN));
+    }
+
 }

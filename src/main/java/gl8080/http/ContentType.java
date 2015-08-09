@@ -46,6 +46,6 @@ public enum ContentType {
 
     public static ContentType toContentType(String extension) {
         Objects.requireNonNull(extension);
-        return EXTENSION_CONTENT_TYPE_MAP.getOrDefault(extension.toUpperCase(), null);
+        return EXTENSION_CONTENT_TYPE_MAP.getOrDefault(extension.toUpperCase(), TEXT_PLAIN);
     };
 }
