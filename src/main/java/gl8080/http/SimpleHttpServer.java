@@ -4,10 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SimpleHttpServer {
+    
+    private ExecutorService service = Executors.newCachedThreadPool();
     
     public void start() {
         try (ServerSocket server = new ServerSocket(80)) {
@@ -20,30 +25,41 @@ public class SimpleHttpServer {
     }
     
     private void serverProcess(ServerSocket server) throws IOException {
-        try (
-            Socket socket = server.accept();
-            InputStream in = socket.getInputStream();
-            OutputStream out = socket.getOutputStream();
-            ) {
-            
-            HttpRequest request = new HttpRequest(in);
-            
-            HttpHeader header = request.getHeader();
-            
-            if (header.isGetMethod()) {
-                File file = new File(".", header.getPath());
+        Socket socket = server.accept();
+        
+        this.service.execute(() -> {
+            try (
+                InputStream in = socket.getInputStream();
+                OutputStream out = socket.getOutputStream();
+                ) {
                 
-                if (file.exists() && file.isFile()) {
-                    this.responseLocalFile(file, out);
+                HttpRequest request = new HttpRequest(in);
+                
+                HttpHeader header = request.getHeader();
+                
+                if (header.isGetMethod()) {
+                    File file = new File(".", header.getPath());
+                    
+                    if (file.exists() && file.isFile()) {
+                        this.responseLocalFile(file, out);
+                    } else {
+                        this.responseNotFoundError(out);
+                    }
                 } else {
-                    this.responseNotFoundError(out);
+                    this.responseOk(out);
                 }
-            } else {
-                this.responseOk(out);
+            } catch (EmptyRequestException e) {
+                // ignore
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } finally {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (EmptyRequestException e) {
-            // ignore
-        }
+        });
     }
 
     private void responseNotFoundError(OutputStream out) throws IOException {
