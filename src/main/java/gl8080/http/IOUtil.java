@@ -34,6 +34,10 @@ public class IOUtil {
         while (true) {
             byte b = (byte)in.read();
             
+            if (b == -1) {
+                throw new EmptyRequestException();
+            }
+            
             list.add(b);
             
             int size = list.size();

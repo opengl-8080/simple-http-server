@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SimpleHttpServer {
-
+    
     public void start() {
         try (ServerSocket server = new ServerSocket(80)) {
             while (true) {
@@ -41,6 +41,8 @@ public class SimpleHttpServer {
             } else {
                 this.responseOk(out);
             }
+        } catch (EmptyRequestException e) {
+            // ignore
         }
     }
 
