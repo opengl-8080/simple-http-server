@@ -41,12 +41,12 @@ public class SimpleHttpServer {
                     File file = new File(".", header.getPath());
                     
                     if (file.exists() && file.isFile()) {
-                        this.responseLocalFile(file, out);
+                        this.respondLocalFile(file, out);
                     } else {
-                        this.responseNotFoundError(out);
+                        this.respondNotFoundError(out);
                     }
                 } else {
-                    this.responseOk(out);
+                    this.respondOk(out);
                 }
             } catch (EmptyRequestException e) {
                 // ignore
@@ -62,20 +62,20 @@ public class SimpleHttpServer {
         });
     }
 
-    private void responseNotFoundError(OutputStream out) throws IOException {
+    private void respondNotFoundError(OutputStream out) throws IOException {
         HttpResponse response = new HttpResponse(Status.NOT_FOUND);
         response.addHeader("Content-Type", ContentType.TEXT_PLAIN);
         response.setBody("404 Not Found");
         response.writeTo(out);
     }
     
-    private void responseLocalFile(File file, OutputStream out) throws IOException {
+    private void respondLocalFile(File file, OutputStream out) throws IOException {
         HttpResponse response = new HttpResponse(Status.OK);
         response.setBody(file);
         response.writeTo(out);
     }
 
-    private void responseOk(OutputStream out) throws IOException {
+    private void respondOk(OutputStream out) throws IOException {
         HttpResponse response = new HttpResponse(Status.OK);
         response.writeTo(out);
     }
