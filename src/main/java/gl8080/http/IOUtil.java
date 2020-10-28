@@ -32,28 +32,27 @@ public class IOUtil {
         List<Byte> list = new ArrayList<>();
         
         while (true) {
-            int c = in.read();
+            int b = in.read();
             
-            if (c == -1) {
+            if (b == -1) {
                 throw new EmptyRequestException();
             }
             
-            list.add((byte)c);
+            list.add((byte)b);
             
             int size = list.size();
             if (2 <= size) {
-                byte cr = list.get(size - 2).byteValue();
-                byte lf = list.get(size - 1).byteValue();
+                char cr = (char)list.get(size - 2).byteValue();
+                char lf = (char)list.get(size - 1).byteValue();
                 
                 if (cr == '\r' && lf == '\n') {
                     break;
                 }
             }
         }
-
-        // copy to byte array except tailing CRLF
-        byte[] buffer = new byte[list.size() - 2]; 
-        for (int i = 0; i < buffer.length; i++) {
+        
+        byte[] buffer = new byte[list.size() - 2]; // CRLF の分減らす
+        for (int i = 0; i < list.size() - 2; i++) {
             buffer[i] = list.get(i);
         }
         
