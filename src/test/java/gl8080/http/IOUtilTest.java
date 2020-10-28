@@ -13,84 +13,70 @@ import org.junit.Test;
 
 public class IOUtilTest {
 
+    /**
+     * readline() normal testing
+     */ 
     @Test
-    public void readLine() throws Exception {
-	byte[] bytes = { 'a', '\r', '\n' };
+    public void readLineN() throws Exception {
+	byte[] bytes = "GET / HTTP/1.1\r\n".getBytes();
 	InputStream in = new ByteArrayInputStream(bytes);
 	String str = IOUtil.readLine(in);
-	assertThat("a", is(str));
+	assertThat("GET / HTTP/1.1", is(str));
     }
-
-    //    @Test
-    public void readLine2() throws Exception {
-	byte[] bytes = { -1, '\r', '\n' };
-	InputStream in = new ByteArrayInputStream(bytes);
-	String str = IOUtil.readLine(in);
-    }
-    
-    @Test(expected = EmptyRequestException.class)
-    public void tryEmptyRequest() throws Exception {    
-	byte[] bytes = { };
-	InputStream in = new ByteArrayInputStream(bytes);
-	String str = IOUtil.readLine(in);
-    }
-
 
     /*
-     * Another Impl of IOUtil.readLine()
+     * readLine() reads data includes isolated CR and LF.
      */
-    public static String readLine(InputStream in) throws IOException {
-        List<Byte> list = new ArrayList<>();
-
-	int c, prev_c = -1;
-        while (true) {
-	    c = in.read();
-	    if (c == -1) {
-		throw new EmptyRequestException();
-	    }
-	    
-	    if (prev_c == '\r' && c == '\n') {
-		list.remove(list.size() - 1); // remove tailing '\r'
-		break;
-	    }
-	    
-            list.add((byte)c);	    
-	    prev_c = c;
-        }
-
-	byte[] buffer = new byte[list.size()];
-	for (int i = 0; i < list.size(); i++) {
-	    buffer[i] = list.get(i);
-	}
-	
-        return new String(buffer);
+    @Test
+    public void isolatedCRandLF() throws Exception {    
+	byte[] bytes = "include isolated \r and \n\r\n".getBytes();
+	InputStream in = new ByteArrayInputStream(bytes);
+	String str = IOUtil.readLine(in);
+	assertThat("include isolated \r and \n", is(str));
     }
 
-    //
-    // Testing for the another Impl of IOUtil.readLine()
-    //
-    
+    /**
+     * readline() boundary testing 0
+     */ 
     @Test
-    public void readLine2_1() throws Exception {
-	byte[] bytes = { 'a', '\r', '\n' };
+    public void readLineB0() throws Exception {
+	byte[] bytes = "\r\n".getBytes();
 	InputStream in = new ByteArrayInputStream(bytes);
-	String str = IOUtilTest.readLine(in);
-	assertThat("a", is(str));
+	String str = IOUtil.readLine(in);
+	assertThat("", is(str));
     }
 
+    /**
+     * readline() boundary testing 1
+     */ 
     @Test
-    public void readLine2_2() throws Exception {
-	byte[] bytes = { -1, '\r', '\n' };
+    public void readLineB1() throws Exception {
+	byte[] bytes = "A\r\n".getBytes();
 	InputStream in = new ByteArrayInputStream(bytes);
-	String str = IOUtilTest.readLine(in);
+	String str = IOUtil.readLine(in);
+	assertThat("A", is(str));
     }
     
+    /**
+     * readLine() can reads 0xFF(-1) as not EOF but data.
+     * without throwing EmptyRequestException. 
+     */
+    @Test
+    public void readLine2() throws Exception {
+	byte[] bytes = { (byte)0xFF, '\r', '\n' };
+	InputStream in = new ByteArrayInputStream(bytes);
+	String str = IOUtil.readLine(in);
+    }
+    
+    /*
+     * readLine() reads empty byte stream then throw
+     * EmptyRequestException.
+     */
     @Test(expected = EmptyRequestException.class)
-    public void tryEmptyRequest2() throws Exception {    
-	byte[] bytes = { };
+    public void throwEmptyRequest() throws Exception {    
+	byte[] bytes = { }; 
 	InputStream in = new ByteArrayInputStream(bytes);
-	String str = IOUtilTest.readLine(in);
+	String str = IOUtil.readLine(in);
     }
-    
 }
 
