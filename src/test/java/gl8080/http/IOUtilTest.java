@@ -78,5 +78,11 @@ public class IOUtilTest {
 	InputStream in = new ByteArrayInputStream(bytes);
 	String str = IOUtil.readLine(in);
     }
+
+    @Test
+    public void castIntToByte() {
+	byte b = (byte)0xFF;
+	assertEquals(-1, b);	
+    }
 }
 
