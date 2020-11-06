@@ -32,13 +32,13 @@ public class IOUtil {
         List<Byte> list = new ArrayList<>();
         
         while (true) {
-            byte b = (byte)in.read();
+            int b = in.read();
             
             if (b == -1) {
                 throw new EmptyRequestException();
             }
             
-            list.add(b);
+            list.add((byte)b);
             
             int size = list.size();
             if (2 <= size) {

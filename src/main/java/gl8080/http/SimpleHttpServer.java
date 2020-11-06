@@ -11,11 +11,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SimpleHttpServer {
-    
+
+    private int port;
     private ExecutorService service = Executors.newCachedThreadPool();
+
+    public SimpleHttpServer(int port) {
+	this.port = port;
+    }
     
     public void start() {
-        try (ServerSocket server = new ServerSocket(80)) {
+        try (ServerSocket server = new ServerSocket(port)) {
             while (true) {
                 this.serverProcess(server);
             }
